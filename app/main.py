@@ -68,12 +68,12 @@ origins = [
     "http://localhost:5176",
     "http://localhost:3000",
     "https://portfolio-vert-zeta-35.vercel.app",
-    os.getenv("FRONTEND_URL", "https://portfolio-vert-zeta-35.vercel.app")
+    os.getenv("FRONTEND_URL", "https://portfolio-vert-zeta-35.vercel.app").rstrip("/")
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
