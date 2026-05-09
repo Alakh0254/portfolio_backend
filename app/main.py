@@ -61,15 +61,7 @@ elif os.path.exists("/tmp/uploads"):
     app.mount("/uploads", StaticFiles(directory="/tmp/uploads"), name="uploads")
 
 # Setup CORS
-origins = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://localhost:5176",
-    "http://localhost:3000",
-    "https://portfolio-vert-zeta-35.vercel.app",
-    os.getenv("FRONTEND_URL", "https://portfolio-vert-zeta-35.vercel.app").rstrip("/")
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
