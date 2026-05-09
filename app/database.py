@@ -19,9 +19,12 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 if not DATABASE_URL:
-    logger.error("DATABASE_URL not found in .env file!")
-    # Template fallback
-    DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
+    logger.error("DATABASE_URL not found in environment variables!")
+    # Only fallback if explicitly allowed or in dev
+    if os.getenv("VERCEL"):
+        logger.critical("Running on Vercel without DATABASE_URL! App will crash.")
+    else:
+        DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/portfolio_db"
 
 logger.info(f"Connecting to database at {DATABASE_URL.split('@')[-1]}...")
 

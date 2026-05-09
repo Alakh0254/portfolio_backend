@@ -18,8 +18,19 @@ from app.database import engine, get_db
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Ensure uploads directory exists
-os.makedirs("uploads", exist_ok=True)
+# Ensure uploads directory exists (Handling Vercel read-only FS)
+UPLOAD_DIR = "uploads"
+try:
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+except Exception as e:
+    logger.warning(f"Could not create uploads directory: {e}. If on Vercel, this is expected.")
+    # Fallback for Vercel
+    UPLOAD_DIR = "/tmp/uploads"
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+    except:
+        pass
 
 app = FastAPI(title="Professional Portfolio API", version="2.0.0")
 
@@ -43,8 +54,11 @@ def startup_db_setup():
     except Exception as e:
         logger.error(f"❌ Database initialization failed: {e}")
 
-# Mount uploads directory
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# Mount uploads directory if it exists
+if os.path.exists("uploads"):
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+elif os.path.exists("/tmp/uploads"):
+    app.mount("/uploads", StaticFiles(directory="/tmp/uploads"), name="uploads")
 
 # Setup CORS
 origins = [
